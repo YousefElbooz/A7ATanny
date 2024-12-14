@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&family=Permanent+Marker&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+        body{
+            display: flex;
+            flex-direction: column;
+            background-color: black;
+            color: white;
+            font-family: "Permanent Marker", cursive;
+            font-weight: 400;
+            font-style: normal;
+            text-align: center ;
+        }
+        iframe{
+            width: 700px;
+            height: 500px;
+            border: solid;
+            border-radius: 10px;
+            border-color: aliceblue ;
+        }
+        .cont{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .cont input{
+            background-color: black;    
+            border: solid;
+            border-radius: 40px;
+            border-color: aliceblue ;        
+            color: aliceblue;
+            padding: 10px;
+            text-align: center;
+        }
+        .buttn button{
+            margin-top: 10px;
+            background-color: white;
+            color: black;
+            border-color: aliceblue ;        
+            border-radius: 40px;
+            width: 100px;
+            padding: 10px;
+            
+        }
+        .buttn button:hover {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: black;
+            color: white;
+            border-color: black ;    
+        }
+        .buttn{
+            display: flex;
+            gap: 10px;    
+        }
+        .comment{
+            width: 500px;
+            display: flex;
+        }
+        .big{
+
+            display: flex;
+            justify-content: center;
+            gap: 100px;
+            margin: 50px;
+        }
+        .comment{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+    </style>
+</head>
+<body>
+        <h1> Pablo & Abyuisf </h1>
+        <p>
+                ABYUSIF x MARWAN PABLO -<br>
+                MATEMSHISH (Official Audio) 
+                | ابيوسف و مروان بابلو - ماتمشيش
+                <br>
+                Produced by HADY MOAMER
+            </p>
+        <div class="big">
+            <div>
+
+                    <iframe src="https://www.youtube.com/embed/Ai8PoyNX32E?autoplay=1"  frameborder="0"></iframe>
+            </div>
+            <div class="comment">
+
+                    <h2>Leave a comment</h2>
+                    <form action="sub" class="cont">
+                    <label for="email">email</label>
+                    <input type="email" name="email" >
+                    <label for="password">password</label>
+                    <input type="password" name="password" >
+                    <label for="comment" >comment</label>
+                    <input type="text" style="height: 100px;" name="comment" >
+                <div class="buttn">
+                    <button type="submit" onclick="sub">submit</button>
+                    <button type="reset" onclick="reset">reset</button>
+                </div>
+            </div>
+        </div>
+
+    
+
+</body>
+</html>
