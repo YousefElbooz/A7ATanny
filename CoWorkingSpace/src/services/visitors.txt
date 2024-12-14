@@ -1,5 +1,5 @@
-Yosef,01218972,1,general,1,8.0,2.5
-Ahmed,012189721,2,formal,0,0.0,0.0
-Alaa,555,3,general,0,0.0,0.0
-Amjad,0100200300,4,formal,0,0.0,0.0
-Osama,55555555,5,instructor,0,0.0,0.0
+Yosef,01218972,1,general,10,0,80.0,0.0
+3adel Shakel,555555,1,formal,5,0,15.0,0.0
+Ahmed,0123,1,formal,0,0,0.0,0.0
+Ma7ame7oo,A7A,1,general,0,0,0.0,0.0
+Bal7a,01218972,1,instructor,0,0,0.0,0.0

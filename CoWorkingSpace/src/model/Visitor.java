@@ -16,6 +16,7 @@ public class Visitor {
         this.type = type;
         this.penaltyFees = 0;
         this.hoursReserved = 0;
+        this.hoursRewarded=0;
         this.totalFees = 0;
         this.hoursReserved = hoursReserved;
     }
@@ -50,7 +51,7 @@ public class Visitor {
     }
 
     public int getHoursRewarded() {
-        return hoursRewarded;
+        return this.hoursRewarded;
     }
 
     public void setHoursRewarded(int hoursRewarded) {
@@ -84,8 +85,13 @@ public class Visitor {
     public void decrementHoursReserved(int hours) {
         this.hoursReserved -= hours;
     }
+
+    public void decrementHoursRewarded(int hours) {
+        this.hoursRewarded -= hours;
+    }
+
     public void displayDetails(){
-        System.out.println("Name: " + name + "ID: " + id + "Type: " + type + "Hours Reserved: "+ hoursReserved  );
+        System.out.println("Name: " + name + " ID: " + id + " Type: " + type + " Hours Reserved: "+ hoursReserved  );
     }
 
     public void setId(int id) {

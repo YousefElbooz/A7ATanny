@@ -3,7 +3,40 @@ package services;
 import model.*;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Scanner;
+
+/*
+    - SystemManager()
+
+    - visitorMenu(Scanner scanner)
+    - findVisitorByName(String name)
+    - loginVisitor(Scanner scanner)
+    - registerVisitor(Scanner scanner)
+    - visitorOperationsMenu(Visitor visitor, Scanner scanner)
+    - makeReservation(Visitor visitor, Scanner scanner)
+    - cancelReservation(Visitor visitor, Scanner scanner)
+    - updateReservation(Visitor visitor, Scanner scanner)
+    - displayAvailableRoomsAndSlots(Visitor visitor)
+    - applyRewardSystem(Visitor visitor)
+
+    - adminMenu(Scanner scanner)
+    - adminOptions(Scanner scanner)
+    - addSlot(Scanner scanner)
+    - deleteEntity(Scanner scanner)
+        - deleteVisitor(Scanner scanner)
+        - deleteRoom(Scanner scanner)
+        - deleteSlot(Scanner scanner)
+    - displayAllAvailableSlots()
+    - displayAllVisitors()
+    - displayAllRooms()
+    - displayAllInstructors()
+    - calculateTotalFees()
+    - updateEntity(Scanner scanner)
+        - updateVisitor(Scanner scanner)
+        - updateRoom(Scanner scanner)
+        - updateSlot(Scanner scanner)
+*/
 
 public class SystemManager {
     protected ArrayList<Visitor> visitors;
@@ -15,7 +48,7 @@ public class SystemManager {
         rooms = FileHandler.loadRooms("CoWorkingSpace/src/services/rooms.txt", visitors);
         admin = new Admin("admin", "admin");
         if (rooms.isEmpty()) {
-            initializeRooms(); // Ensure rooms are initialized if file is empty
+            initializeRooms();
         }
     }
 
@@ -39,8 +72,6 @@ public class SystemManager {
         room = new TeachingRoom("Teaching Room 1", 5, "4K", "Whiteboard", "Ali");
         room.addSlotVisitors(new Slot("10:00", "2024-12-1", 15, true));
         rooms.add(room);
-
-         
     }
 
     public void visitorMenu(Scanner scanner) {
@@ -49,7 +80,7 @@ public class SystemManager {
         System.out.println("3. Back to Main Menu");
         System.out.print("Choose an option: ");
         int choice = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
 
         switch (choice) {
             case 1 -> loginVisitor(scanner);
@@ -94,7 +125,7 @@ public class SystemManager {
         System.out.println("3. Instructor");
         System.out.print("Choose an option: ");
         int typeChoice = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
 
         String type = switch (typeChoice) {
             case 1 -> "general";
@@ -108,7 +139,6 @@ public class SystemManager {
 
         Visitor newVisitor = new Visitor(name, password, visitors.size() + 1, type);
         visitors.add(newVisitor);
-         
 
         System.out.println("Registration successful! You can now log in.");
     }
@@ -119,23 +149,34 @@ public class SystemManager {
             System.out.println("2. Cancel Reservation");
             System.out.println("3. Update Reservation");
             System.out.println("4. Display Available Slots");
-            System.out.println("5. Logout");
+            System.out.println("5. Display Leader Board");
+            System.out.println("6. Logout");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+            scanner.nextLine();
 
             switch (choice) {
                 case 1 -> makeReservation(visitor, scanner);
                 case 2 -> cancelReservation(visitor, scanner);
                 case 3 -> updateReservation(visitor, scanner);
                 case 4 -> displayAvailableRoomsAndSlots(visitor);
-                case 5 -> {
+                case 5 -> LeaderBoardForVisitor();
+                case 6 -> {
                     System.out.println("Logging out...");
                     return;
                 }
                 default -> System.out.println("Invalid choice. Please try again.");
             }
+            savedata();
         }
+    }
+
+    public void LeaderBoardForVisitor(){
+            visitors.sort(Comparator.comparingInt(Visitor::getHoursReserved).reversed());
+
+            for (Visitor visitor : visitors) {
+                visitor.displayDetails();
+            }
     }
 
     public void makeReservation(Visitor visitor, Scanner scanner) {
@@ -183,17 +224,39 @@ public class SystemManager {
         if (selectedSlot == null) {
             System.out.println("Invalid slot. Please try again.");
             return;
+        }    
+        boolean useFreeHour = false;
+        if (visitor.getHoursRewarded() > 0) { // Correct method name
+            while (true) { // Loop until valid input
+                System.out.print("You have " + visitor.getHoursRewarded() + " free hour(s). Do you want to use a free hour for this reservation? (yes/no): ");
+                String response = scanner.nextLine().trim().toLowerCase();
+    
+                if (response.equals("yes") || response.equals("y")) {
+                    useFreeHour = true;
+                    visitor.decrementHoursRewarded(1);
+                    selectedRoom.addSlotVisitors(visitor, selectedSlot);
+                    System.out.println("A free hour has been applied to your reservation.");
+                    break;
+                } else if (response.equals("no") || response.equals("n")) {
+                    useFreeHour = false;
+                    break;
+                } else {
+                    System.out.println("Invalid input. Please enter 'yes' or 'no'.");
+                }
+            }
         }
+    
         selectedSlot.setAvailable(false);
         selectedRoom.addSlotVisitors(visitor, selectedSlot);
         visitor.incrementHoursReserved(1);
-        if (visitor.getHoursRewarded() > 0) {
-            System.out.println("Congratulations, Your Reservation Is On US");
+        if (!useFreeHour) {
+            visitor.setTotalFees(visitor.getTotalFees() + selectedSlot.getFees());
+            System.out.println("Fees of $" + selectedSlot.getFees() + " have been added to your account.");
         } else {
-            visitor.setTotalFees(selectedSlot.getFees());
+            System.out.println("You have used a free hour. No fees charged for this reservation.");
         }
         System.out.println("Reservation successful for " + selectedRoom.getName() + " on " + selectedDate + " at " + selectedTime);
-         
+        applyRewardSystem(visitor);
     }
 
     public void savedata() {
@@ -217,7 +280,6 @@ public class SystemManager {
             return;
         }
 
-        // Allow the visitor to choose the room they want to cancel
         System.out.println("Rooms where you have reservations:");
         for (Room room : roomsWithReservations) {
             System.out.println("Room: " + room.getName() + " (ID: " + room.getID() + ")");
@@ -225,7 +287,7 @@ public class SystemManager {
 
         System.out.print("Enter room ID to cancel reservation: ");
         int roomId = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
 
         Room selectedRoom = null;
         for (Room room : roomsWithReservations) {
@@ -235,13 +297,11 @@ public class SystemManager {
             }
         }
 
-        // Check if the room ID is valid
         if (selectedRoom == null) {
             System.out.println("Invalid room ID. Please try again.");
             return;
         }
 
-        // Show slots the visitor has reserved in the selected room
         ArrayList<Slot> reservedSlots = new ArrayList<>();
         for (Slot slot : selectedRoom.getVisitorsInEachSlot().keySet()) {
             if (!slot.isAvailable() && selectedRoom.getSlotVisitors(slot).contains(visitor)) {
@@ -250,13 +310,11 @@ public class SystemManager {
             }
         }
 
-        // If no slots are reserved, exit the method
         if (reservedSlots.isEmpty()) {
             System.out.println("You don't have any reserved slots in this room.");
             return;
         }
 
-        // Let the visitor choose which slot to cancel
         System.out.print("Enter the date (yyyy-mm-dd) of the slot you want to cancel: ");
         String selectedDate = scanner.nextLine();
         System.out.print("Enter the time (hh:mm) of the slot you want to cancel: ");
@@ -270,23 +328,18 @@ public class SystemManager {
             }
         }
 
-        // If the slot is not found, show an error message
         if (selectedSlot == null) {
             System.out.println("Invalid slot. Please try again.");
             return;
         }
 
-        // Cancel the reservation by marking the slot as available and removing the visitor
         selectedSlot.setAvailable(true);
         selectedRoom.removeVisitor(visitor, selectedSlot);
-        visitor.decrementHoursReserved(1); // Assuming the reservation was for 1 hour
-        visitor.setPenaltyFees(selectedSlot.getFees() * 0.10); // Assuming a method to add penalty fees
-        visitor.setTotalFees(visitor.getTotalFees()-selectedSlot.getFees()); // Assuming a method to reset total fees
+        visitor.decrementHoursReserved(1);
+        visitor.setPenaltyFees(selectedSlot.getFees() * 0.10);
+        visitor.setTotalFees(visitor.getTotalFees() - selectedSlot.getFees());
 
         System.out.println("Reservation cancelled for " + selectedRoom.getName() + " on " + selectedDate + " at " + selectedTime);
-
-        // Save the updated visitors and rooms to the files
-         
     }
 
     public void updateReservation(Visitor visitor, Scanner scanner) {
@@ -306,7 +359,6 @@ public class SystemManager {
             return;
         }
 
-        // Allow the visitor to choose the room they want to update
         System.out.println("Rooms where you have reservations:");
         for (Room room : roomsWithReservations) {
             System.out.println("Room: " + room.getName() + " (ID: " + room.getID() + ")");
@@ -314,7 +366,7 @@ public class SystemManager {
 
         System.out.print("Enter room ID to update reservation: ");
         int roomId = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
 
         Room selectedRoom = null;
         for (Room room : roomsWithReservations) {
@@ -324,13 +376,11 @@ public class SystemManager {
             }
         }
 
-        // Check if the room ID is valid
         if (selectedRoom == null) {
             System.out.println("Invalid room ID. Please try again.");
             return;
         }
 
-        // Show slots the visitor has reserved in the selected room
         ArrayList<Slot> reservedSlots = new ArrayList<>();
         for (Slot slot : selectedRoom.getVisitorsInEachSlot().keySet()) {
             if (!slot.isAvailable() && selectedRoom.getSlotVisitors(slot).contains(visitor)) {
@@ -339,13 +389,11 @@ public class SystemManager {
             }
         }
 
-        // If no slots are reserved, exit the method
         if (reservedSlots.isEmpty()) {
             System.out.println("You don't have any reserved slots in this room.");
             return;
         }
 
-        // Let the visitor choose which slot to update
         System.out.print("Enter the date (yyyy-mm-dd) of the slot you want to update: ");
         String selectedDate = scanner.nextLine();
         System.out.print("Enter the time (hh:mm) of the slot you want to update: ");
@@ -359,13 +407,11 @@ public class SystemManager {
             }
         }
 
-        // If the slot is not found, show an error message
         if (selectedSlot == null) {
             System.out.println("Invalid slot. Please try again.");
             return;
         }
 
-        // Display available slots for updating
         System.out.println("Available slots for " + selectedRoom.getName() + ":");
         for (Slot slot : selectedRoom.getVisitorsInEachSlot().keySet()) {
             if (slot.isAvailable()) {
@@ -373,13 +419,11 @@ public class SystemManager {
             }
         }
 
-        // Let the visitor choose a new slot to move the reservation
         System.out.print("Enter the new date (yyyy-mm-dd) for the slot: ");
         String newDate = scanner.nextLine();
         System.out.print("Enter the new time (hh:mm) for the slot: ");
         String newTime = scanner.nextLine();
 
-        // Find if the new slot is available
         Slot newSlot = null;
         for (Slot slot : selectedRoom.getVisitorsInEachSlot().keySet()) {
             if (slot.getDate().equals(newDate) && slot.getTime().equals(newTime) && slot.isAvailable()) {
@@ -388,26 +432,21 @@ public class SystemManager {
             }
         }
 
-        // If the new slot is not available, show an error message
         if (newSlot == null) {
             System.out.println("The new slot is not available. Please try again.");
             return;
         }
 
-        // Update the reservation by removing the visitor from the old slot and adding to the new slot
-        selectedSlot.setAvailable(true); // Mark old slot as available
-        selectedRoom.removeVisitor(visitor, selectedSlot); // Remove visitor from old slot
+        selectedSlot.setAvailable(true);
+        selectedRoom.removeVisitor(visitor, selectedSlot);
 
-        newSlot.setAvailable(false); // Mark new slot as reserved
+        newSlot.setAvailable(false);
         selectedRoom.addSlotVisitors(visitor, newSlot);
-        visitor.setPenaltyFees(selectedSlot.getFees() * 0.10); // Apply penalty for changing reservation
+        visitor.setPenaltyFees(selectedSlot.getFees() * 0.10);
         visitor.setTotalFees(newSlot.getFees());
 
         System.out.println("Reservation updated for " + selectedRoom.getName() + " from " + selectedDate + " at " + selectedTime +
                 " to " + newDate + " at " + newTime);
-
-        // Save the updated visitors and rooms to the files
-         
     }
 
     public ArrayList<Room> displayAvailableRoomsAndSlots(Visitor visitor) {
@@ -439,26 +478,23 @@ public class SystemManager {
     }
 
     public void applyRewardSystem(Visitor visitor) {
-        // Define reward thresholds
         int generalVisitorRewardThreshold = 6;
         int instructorVisitorRewardThreshold = 12;
         int rewardHours = 0;
         if (visitor.getType().equalsIgnoreCase("instructor")) {
-            rewardHours = visitor.getHoursReserved() / instructorVisitorRewardThreshold;
+            if(visitor.getHoursReserved() % instructorVisitorRewardThreshold==0&&visitor.getHoursReserved()>0){rewardHours++;};
         } else {
-            rewardHours = visitor.getHoursReserved() / generalVisitorRewardThreshold;
+            if(visitor.getHoursReserved() % generalVisitorRewardThreshold==0&&visitor.getHoursReserved()>0){rewardHours++;};
+
         }
 
         if (rewardHours > 0) {
-            // Apply rewards
-            visitor.addRewardHours(rewardHours); // Assuming the Visitor class has a method to add free hours
-
+            visitor.addRewardHours(rewardHours);
             System.out.println("You have earned " + rewardHours + " free hours for your reservations!");
         } else {
             System.out.println("No rewards earned yet.");
         }
 
-        // Save the updated visitor data after applying rewards
         FileHandler.saveVisitors("CoWorkingSpace/src/services/visitors.txt", visitors);
     }
 
@@ -476,9 +512,6 @@ public class SystemManager {
         }
     }
 
-
-
-
     public void adminOptions(Scanner scanner) {
         while (true) {
             System.out.println("\n--- Admin Menu ---");
@@ -493,7 +526,7 @@ public class SystemManager {
             System.out.println("9. Logout");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+            scanner.nextLine();
 
             switch (choice) {
                 case 1 -> addSlot(scanner);
@@ -517,7 +550,7 @@ public class SystemManager {
     public void addSlot(Scanner scanner) {
         System.out.println("Enter the fees of the slot you want to create: ");
         double selectedFees = scanner.nextDouble();
-        scanner.nextLine();  // Consume the leftover newline after nextDouble()
+        scanner.nextLine();
 
         System.out.println("Enter the time (hh:mm) of the slot you want to create: ");
         String time = scanner.nextLine();
@@ -528,7 +561,7 @@ public class SystemManager {
         Slot newSlot = new Slot(time, selectedDate, selectedFees, true);
         System.out.println("Enter the ID of the Room you want to create a slot in: ");
         int roomID = scanner.nextInt();
-        scanner.nextLine();  // Consume the leftover newline after nextInt()
+        scanner.nextLine();
 
         Room selectedRoom = null;
         for (Room room : rooms) {
@@ -549,7 +582,6 @@ public class SystemManager {
         FileHandler.saveRooms("CoWorkingSpace/src/services/rooms.txt", rooms);
     }
 
-
     public void deleteEntity(Scanner scanner) {
         System.out.println("\n--- Delete Entity ---");
         System.out.println("1. Delete Visitor");
@@ -557,7 +589,7 @@ public class SystemManager {
         System.out.println("3. Delete Slot");
         System.out.print("Choose an option: ");
         int choice = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
 
         switch (choice) {
             case 1 -> deleteVisitor(scanner);
@@ -570,7 +602,7 @@ public class SystemManager {
     private void deleteVisitor(Scanner scanner) {
         System.out.print("Enter Visitor ID to delete: ");
         int visitorId = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
 
         Visitor visitorToDelete = null;
         for (Visitor visitor : visitors) {
@@ -585,7 +617,6 @@ public class SystemManager {
             return;
         }
 
-        // Remove visitor from all room slots
         for (Room room : rooms) {
             for (Slot slot : room.getVisitorsInEachSlot().keySet()) {
                 if (!slot.isAvailable()) {
@@ -596,14 +627,12 @@ public class SystemManager {
 
         visitors.remove(visitorToDelete);
         System.out.println("Visitor deleted successfully.");
-
-         
     }
 
     private void deleteRoom(Scanner scanner) {
         System.out.print("Enter Room ID to delete: ");
         int roomId = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
 
         Room roomToDelete = null;
         for (Room room : rooms) {
@@ -620,14 +649,12 @@ public class SystemManager {
 
         rooms.remove(roomToDelete);
         System.out.println("Room deleted successfully.");
-
-         
     }
 
     private void deleteSlot(Scanner scanner) {
         System.out.print("Enter Room ID where the slot is located: ");
         int roomId = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
 
         Room selectedRoom = null;
         for (Room room : rooms) {
@@ -687,14 +714,14 @@ public class SystemManager {
             }
         }
     }
-    
+
     public void displayAllVisitors() {
         System.out.println("\n--- All Visitors ---");
         for (Visitor visitor : visitors) {
             System.out.println("ID: " + visitor.getId() + ", Name: " + visitor.getName() + ", Type: " + visitor.getType() + ", Total Fees: $" + visitor.getTotalFees());
         }
     }
-    
+
     public void displayAllRooms() {
         System.out.println("\n--- All Rooms ---");
         for (Room room : rooms) {
@@ -703,7 +730,7 @@ public class SystemManager {
         }
     }
 
-        public void displayAllInstructors() {
+    public void displayAllInstructors() {
         System.out.println("\n--- All Instructors ---");
         for (Visitor visitor : visitors) {
             if (visitor.getType().equalsIgnoreCase("instructor")) {
@@ -711,6 +738,7 @@ public class SystemManager {
             }
         }
     }
+
     public void calculateTotalFees() {
         double totalGeneral = 0;
         double totalMeeting = 0;
@@ -735,6 +763,7 @@ public class SystemManager {
         System.out.println("Meeting Rooms: $" + totalMeeting);
         System.out.println("Teaching Rooms: $" + totalTeaching);
     }
+
     public void updateEntity(Scanner scanner) {
         System.out.println("\n--- Update Entity ---");
         System.out.println("1. Update Visitor");
@@ -742,7 +771,7 @@ public class SystemManager {
         System.out.println("3. Update Slot");
         System.out.print("Choose an option: ");
         int choice = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
 
         switch (choice) {
             case 1 -> updateVisitor(scanner);
@@ -752,11 +781,10 @@ public class SystemManager {
         }
     }
 
-
     private void updateVisitor(Scanner scanner) {
         System.out.print("Enter Visitor ID to update: ");
         int visitorId = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
 
         Visitor visitorToUpdate = null;
         for (Visitor visitor : visitors) {
@@ -812,14 +840,12 @@ public class SystemManager {
         }
 
         System.out.println("Visitor updated successfully.");
-         
     }
-
 
     private void updateRoom(Scanner scanner) {
         System.out.print("Enter Room ID to update: ");
         int roomId = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
 
         Room roomToUpdate = null;
         for (Room room : rooms) {
@@ -865,14 +891,12 @@ public class SystemManager {
         }
 
         System.out.println("Room updated successfully.");
-         
     }
-
 
     private void updateSlot(Scanner scanner) {
         System.out.print("Enter Room ID where the slot is located: ");
         int roomId = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
 
         Room selectedRoom = null;
         for (Room room : rooms) {
@@ -935,6 +959,5 @@ public class SystemManager {
         }
 
         System.out.println("Slot updated successfully.");
-         
     }
 }
