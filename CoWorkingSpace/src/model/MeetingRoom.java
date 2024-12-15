@@ -31,26 +31,35 @@ public class MeetingRoom extends Room {
 
 
         @Override
-        public void addSlotVisitors(ArrayList<Visitor>visitors,Slot slot){
-            if((this.visitorsInEachSlot.get(slot) == null) && visitors.size() <= 20){
+        public boolean addSlotVisitors(ArrayList<Visitor>visitors,Slot slot){
+            if((this.visitorsInEachSlot.get(slot) == null) && visitors.size() <= maxNumber){
                 this.visitorsInEachSlot.put(slot, visitors);
-            }else if((this.visitorsInEachSlot.get(slot).size() <= 20) && (this.visitorsInEachSlot.get(slot).size() + visitors.size() <= 20)){
+                return true;
+            }else if((this.visitorsInEachSlot.get(slot).size() <= maxNumber) && (this.visitorsInEachSlot.get(slot).size() + visitors.size() <= maxNumber)){
                     this.visitorsInEachSlot.put(slot, visitors); 
+                    return true;
             }else{
                     System.out.println("Sorry, Room is full.");
+                    return false;
             }
         }
-
+    
         @Override
-        public void addSlotVisitors(Visitor visitor,Slot slot){
+        public boolean addSlotVisitors(Visitor visitor,Slot slot){
             ArrayList<Visitor> a =new ArrayList<>();
-            a.add(visitor);
             if((this.visitorsInEachSlot.get(slot) == null)){
+                a.add(visitor);
                 this.visitorsInEachSlot.put(slot, a);
-            }else if(this.visitorsInEachSlot.get(slot).size() < 10){
-                    this.visitorsInEachSlot.put(slot, a); 
+                return true;
+            }else if(this.visitorsInEachSlot.get(slot).size() < maxNumber){
+                a= this.visitorsInEachSlot.get(slot);
+                a.add(visitor);    
+                this.visitorsInEachSlot.put(slot, a);
+                return true;
             }else{
-                    System.out.println("Sorry, Room is full.");
+                System.out.println("Sorry, Room is full.");
+                return false;
+    
             }
         }
     

@@ -18,9 +18,9 @@ public abstract class Room {
     public abstract int getMaxNumber();
 
     
-    public abstract void addSlotVisitors(ArrayList<Visitor> visitors, Slot slot);
+    public abstract boolean addSlotVisitors(ArrayList<Visitor> visitors, Slot slot);
 
-    public abstract void addSlotVisitors(Visitor visitor, Slot slot);
+    public abstract boolean addSlotVisitors(Visitor visitor, Slot slot);
 
     public abstract void addSlotVisitors( Slot slot);
     

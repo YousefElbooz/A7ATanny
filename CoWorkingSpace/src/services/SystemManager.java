@@ -2,8 +2,13 @@ package services;
 
 import model.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Scanner;
 
 /*
@@ -39,6 +44,9 @@ import java.util.Scanner;
 */
 
 public class SystemManager {
+
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
     protected ArrayList<Visitor> visitors;
     private Admin admin;
     protected ArrayList<Room> rooms;
@@ -53,25 +61,52 @@ public class SystemManager {
     }
 
     private void initializeRooms() {
-        Room room = new GeneralRoom("General Room 1", 1);
-        room.addSlotVisitors(new Slot("10:00", "2024-12-1", 15, true));
-        rooms.add(room);
+        // Room room = new GeneralRoom("General Room 1", 1);
+        // room.addSlotVisitors(new Slot("10:00", "2024-12-1", 15, true));
+        // rooms.add(room);
 
-        room = new GeneralRoom("General Room 2", 2);
-        room.addSlotVisitors(new Slot("10:00", "2024-12-1", 15, true));
-        rooms.add(room);
+        // room = new GeneralRoom("General Room 2", 2);
+        // room.addSlotVisitors(new Slot("10:00", "2024-12-1", 15, true));
+        // rooms.add(room);
 
-        room = new MeetingRoom("Meeting Room 1", 3);
-        room.addSlotVisitors(new Slot("10:00", "2024-12-1", 15, true));
-        rooms.add(room);
+        // room = new MeetingRoom("Meeting Room 1", 3);
+        // room.addSlotVisitors(new Slot("10:00", "2024-12-1", 15, true));
+        // rooms.add(room);
 
-        room = new MeetingRoom("Meeting Room 2", 4);
-        room.addSlotVisitors(new Slot("10:00", "2024-12-1", 15, true));
-        rooms.add(room);
+        // room = new MeetingRoom("Meeting Room 2", 4);
+        // room.addSlotVisitors(new Slot("10:00", "2024-12-1", 15, true));
+        // rooms.add(room);
 
-        room = new TeachingRoom("Teaching Room 1", 5, "4K", "Whiteboard", "Ali");
-        room.addSlotVisitors(new Slot("10:00", "2024-12-1", 15, true));
-        rooms.add(room);
+        // room = new TeachingRoom("Teaching Room 1", 5, "4K", "Whiteboard", "Ali");
+        // room.addSlotVisitors(new Slot("10:00", "2024-12-1", 15, true));
+        // rooms.add(room);
+        LocalDate initialDate = LocalDate.parse("2024-12-01", DATE_FORMATTER);
+            LocalTime initialTime = LocalTime.parse("10:00", TIME_FORMATTER);
+            Room room = new GeneralRoom("General Room 1", 1);
+            room.addSlotVisitors(new Slot(initialTime, initialDate, 15, true));
+            rooms.add(room);
+            room = new GeneralRoom("General Room 2", 2);
+            room.addSlotVisitors(new Slot(initialTime, initialDate, 15, true));
+            rooms.add(room);
+            room = new MeetingRoom("Meeting Room 1", 3);
+            room.addSlotVisitors(new Slot(initialTime, initialDate, 15, true));
+            rooms.add(room);
+            room = new MeetingRoom("Meeting Room 2", 4);
+            room.addSlotVisitors(new Slot(initialTime, initialDate, 15, true));
+            rooms.add(room);
+            room = new TeachingRoom("Teaching Room 1", 5, "4K", "Whiteboard", "Ali");
+            room.addSlotVisitors(new Slot(initialTime, initialDate, 15, true));
+            rooms.add(room);
+    }
+
+    public Room findRoomById(int id){
+        Room selectedRoom = null;
+        for (Room room : rooms) {
+            if(room.getID()==id){
+                selectedRoom = room;
+            }
+        }
+        return selectedRoom;
     }
 
     public void visitorMenu(Scanner scanner) {
@@ -145,23 +180,25 @@ public class SystemManager {
 
     private void visitorOperationsMenu(Visitor visitor, Scanner scanner) {
         while (true) {
-            System.out.println("1. Make Reservation");
-            System.out.println("2. Cancel Reservation");
-            System.out.println("3. Update Reservation");
-            System.out.println("4. Display Available Slots");
-            System.out.println("5. Display Leader Board");
-            System.out.println("6. Logout");
+            System.out.println("1. Join Reservation");
+            System.out.println("2. Make Reservation");
+            System.out.println("3. Cancel Reservation");
+            System.out.println("4. Update Reservation");
+            System.out.println("5. Display Available Slots");
+            System.out.println("6. Display Leader Board");
+            System.out.println("7. Logout");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
             scanner.nextLine();
 
             switch (choice) {
-                case 1 -> makeReservation(visitor, scanner);
-                case 2 -> cancelReservation(visitor, scanner);
-                case 3 -> updateReservation(visitor, scanner);
-                case 4 -> displayAvailableRoomsAndSlots(visitor);
-                case 5 -> LeaderBoardForVisitor();
-                case 6 -> {
+                case 1 -> joinReservation(visitor, scanner);
+                case 2 -> makeReservation(visitor, scanner);
+                case 3 -> cancelReservation(visitor, scanner);
+                case 4 -> updateReservation(visitor, scanner);
+                case 5 -> displayAvailableRoomsAndSlots(visitor);
+                case 6 -> LeaderBoardForVisitor();
+                case 7 -> {
                     System.out.println("Logging out...");
                     return;
                 }
@@ -178,6 +215,134 @@ public class SystemManager {
                 visitor.displayDetails();
             }
     }
+
+    public void joinReservation(Visitor visitor, Scanner scanner){
+        System.out.print("Enter Your Join Code (format: roomId&date&time): ");
+        String code = scanner.nextLine().trim();
+    
+        String[] data = code.split("&");
+        if (data.length != 3) {
+            System.out.println("Invalid join code format. Please use 'roomId&date&time'.");
+            return;
+        }
+    
+        int roomId;
+        LocalDate slotDate;
+        LocalTime slotTime;
+    
+        // Parse the join code components with error handling
+        try {
+            roomId = Integer.parseInt(data[0].trim());
+            slotDate = LocalDate.parse(data[1].trim(), DATE_FORMATTER);
+            slotTime = LocalTime.parse(data[2].trim(), TIME_FORMATTER);
+        } catch (NumberFormatException | DateTimeParseException e) {
+            System.out.println("Invalid join code components: " + e.getMessage());
+            return;
+        }
+    
+        Room selectedRoom = findRoomById(roomId);
+        if (selectedRoom == null) {
+            System.out.println("No room found with ID " + roomId + ".");
+            return;
+        }
+    
+        Slot selectedSlot = null;
+        for (Slot slot : selectedRoom.getVisitorsInEachSlot().keySet()) {
+            if (slot.getDate().equals(slotDate) && slot.getTime().equals(slotTime)) {
+                selectedSlot = slot;
+                break;
+            }
+        }
+    
+        if (selectedSlot == null) {
+            System.out.println("No slot found on " + slotDate + " at " + slotTime + ".");
+            return;
+        }
+    
+        List<Visitor> slotVisitors = selectedRoom.getSlotVisitors(selectedSlot);
+        if (slotVisitors.contains(visitor)) {
+            System.out.println("You have already joined this reservation.");
+            return;
+        }
+    
+        boolean added = selectedRoom.addSlotVisitors(visitor, selectedSlot);
+        if (added) {
+            boolean useFreeHour = false;
+            if (visitor.getHoursRewarded() > 0) {
+                while (true) {
+                    System.out.print("You have " + visitor.getHoursRewarded() + " free hour(s). Do you want to use a free hour for this reservation? (yes/no): ");
+                    String response = scanner.nextLine().trim().toLowerCase();
+    
+                    if (response.equals("yes") || response.equals("y")) {
+                        useFreeHour = true;
+                        visitor.decrementHoursRewarded(1);
+                        System.out.println("A free hour has been applied to your reservation.");
+                        break;
+                    } else if (response.equals("no") || response.equals("n")) {
+                        useFreeHour = false;
+                        break;
+                    } else {
+                        System.out.println("Invalid input. Please enter 'yes' or 'no'.");
+                    }
+                }
+            }
+    
+            if (!useFreeHour) {
+                double reservationFee = selectedSlot.getFees();
+                boolean validChoice = false;
+    
+                while (!validChoice) {
+                    System.out.println("\nPayment Options:");
+                    System.out.println("1. Pay this reservation's fee now.");
+                    System.out.println("2. Pay your total accumulated fees now.");
+                    System.out.println("3. Skip payment for now (fees will be added to your account).");
+                    System.out.print("Choose an option (1/2/3): ");
+                    String paymentChoice = scanner.nextLine().trim();
+    
+                    switch (paymentChoice) {
+                        case "1":
+                    // Pay this reservation's fee
+                    visitor.setPayedFees(visitor.getPayedFees() + reservationFee);
+                    System.out.println("Fees of $" + reservationFee + " have been paid and added to your account.");
+                    validChoice = true;
+                    break;
+                case "2":
+                    // Pay total accumulated fees
+                    double totalFees = visitor.getTotalFees();
+                    if (totalFees > 0) {
+                        visitor.setPayedFees(visitor.getPayedFees() + totalFees);
+                        visitor.setTotalFees(0);
+                        System.out.println("Total fees of $" + totalFees + " have been paid and your account balance is now $0.");
+                    } else {
+                        System.out.println("You have no accumulated fees to pay.");
+                    }
+                    validChoice = true;
+                    break;
+                case "3":
+                    // Add reservation fee to total fees
+                    visitor.setTotalFees(visitor.getTotalFees() + reservationFee);
+                    System.out.println("Fees of $" + reservationFee + " have been added to your account.");
+                    validChoice = true;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please select option 1, 2, or 3.");
+                }
+                }
+            } else {
+                System.out.println("You have used a free hour. No fees charged for this reservation.");
+            }
+    
+            visitor.incrementHoursReserved(1);
+            System.out.println("Successfully joined the reservation for " + selectedRoom.getName() + " on " +
+                    slotDate + " at " + slotTime + ".");
+            System.out.println("Your Join Code: " + selectedRoom.getID() + "&" + slotDate + "&" + slotTime);
+            applyRewardSystem(visitor);
+            savedata();
+        } else {
+            System.out.println("Failed to join the reservation. The slot might be full.");
+        }
+    }
+    
 
     public void makeReservation(Visitor visitor, Scanner scanner) {
         ArrayList<Room> availableRooms = displayAvailableRoomsAndSlots(visitor);
@@ -211,16 +376,27 @@ public class SystemManager {
             return;
         }
         System.out.print("Enter the date (yyyy-mm-dd) of the slot you want to reserve: ");
-        String selectedDate = scanner.nextLine();
+        String dateInput = scanner.nextLine();
         System.out.print("Enter the time (hh:mm) of the slot you want to reserve: ");
-        String selectedTime = scanner.nextLine();
-        Slot selectedSlot = null;
+        String timeInput = scanner.nextLine();
+    
+        Slot selectedSlot=null;
+        LocalDate selectedDate;
+        LocalTime selectedTime;
+        try {
+            selectedDate = LocalDate.parse(dateInput, DATE_FORMATTER);
+            selectedTime = LocalTime.parse(timeInput, TIME_FORMATTER);
+        } catch (DateTimeParseException e) {
+            System.out.println("Invalid date/time format: " + e.getMessage());
+            return;
+        }
+
         for (Slot slot : availableSlots) {
-            if (slot.getDate().equals(selectedDate) && slot.getTime().equals(selectedTime)) {
-                selectedSlot = slot;
-                break;
+            if(slot.getDate().equals(selectedDate)&&slot.getTime().equals(selectedTime)){
+                selectedSlot=slot;
             }
         }
+
         if (selectedSlot == null) {
             System.out.println("Invalid slot. Please try again.");
             return;
@@ -234,7 +410,6 @@ public class SystemManager {
                 if (response.equals("yes") || response.equals("y")) {
                     useFreeHour = true;
                     visitor.decrementHoursRewarded(1);
-                    selectedRoom.addSlotVisitors(visitor, selectedSlot);
                     System.out.println("A free hour has been applied to your reservation.");
                     break;
                 } else if (response.equals("no") || response.equals("n")) {
@@ -246,17 +421,63 @@ public class SystemManager {
             }
         }
     
-        selectedSlot.setAvailable(false);
-        selectedRoom.addSlotVisitors(visitor, selectedSlot);
-        visitor.incrementHoursReserved(1);
-        if (!useFreeHour) {
-            visitor.setTotalFees(visitor.getTotalFees() + selectedSlot.getFees());
-            System.out.println("Fees of $" + selectedSlot.getFees() + " have been added to your account.");
-        } else {
-            System.out.println("You have used a free hour. No fees charged for this reservation.");
+        
+
+            // Reserve the slot
+    selectedSlot.setAvailable(false);
+    selectedRoom.addSlotVisitors(visitor, selectedSlot);
+    visitor.incrementHoursReserved(1);
+
+    if (!useFreeHour) {
+        double reservationFee = selectedSlot.getFees();
+        boolean validChoice = false;
+
+        while (!validChoice) {
+            System.out.println("\nPayment Options:");
+            System.out.println("1. Pay this reservation's fee now.");
+            System.out.println("2. Pay your total accumulated fees now.");
+            System.out.println("3. Skip payment for now (fees will be added to your account).");
+            System.out.print("Choose an option (1/2/3): ");
+            String paymentChoice = scanner.nextLine().trim();
+
+            switch (paymentChoice) {
+                case "1":
+                    // Pay this reservation's fee
+                    visitor.setPayedFees(visitor.getPayedFees() + reservationFee);
+                    System.out.println("Fees of $" + reservationFee + " have been paid and added to your account.");
+                    validChoice = true;
+                    break;
+                case "2":
+                    // Pay total accumulated fees
+                    double totalFees = visitor.getTotalFees();
+                    if (totalFees > 0) {
+                        visitor.setPayedFees(visitor.getPayedFees() + totalFees);
+                        visitor.setTotalFees(0);
+                        System.out.println("Total fees of $" + totalFees + " have been paid and your account balance is now $0.");
+                    } else {
+                        System.out.println("You have no accumulated fees to pay.");
+                    }
+                    validChoice = true;
+                    break;
+                case "3":
+                    // Add reservation fee to total fees
+                    visitor.setTotalFees(visitor.getTotalFees() + reservationFee);
+                    System.out.println("Fees of $" + reservationFee + " have been added to your account.");
+                    validChoice = true;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please select option 1, 2, or 3.");
+            }
         }
-        System.out.println("Reservation successful for " + selectedRoom.getName() + " on " + selectedDate + " at " + selectedTime);
-        applyRewardSystem(visitor);
+    } else {
+        System.out.println("You have used a free hour. No fees charged for this reservation.");
+    }
+
+    System.out.println("Reservation successful for " + selectedRoom.getName() + " on " + selectedDate + " at " + selectedTime);
+    System.out.println("Your Join Code: " + selectedRoom.getID() + "&" + selectedDate + "&" + selectedTime);
+
+    applyRewardSystem(visitor);
+
     }
 
     public void savedata() {
@@ -316,15 +537,24 @@ public class SystemManager {
         }
 
         System.out.print("Enter the date (yyyy-mm-dd) of the slot you want to cancel: ");
-        String selectedDate = scanner.nextLine();
+        String dateInput = scanner.nextLine();
         System.out.print("Enter the time (hh:mm) of the slot you want to cancel: ");
-        String selectedTime = scanner.nextLine();
+        String timeInput = scanner.nextLine();
 
-        Slot selectedSlot = null;
+        Slot selectedSlot=null;
+        LocalDate selectedDate;
+        LocalTime selectedTime;
+        try {
+            selectedDate = LocalDate.parse(dateInput, DATE_FORMATTER);
+            selectedTime = LocalTime.parse(timeInput, TIME_FORMATTER);
+        } catch (DateTimeParseException e) {
+            System.out.println("Invalid date/time format: " + e.getMessage());
+            return;
+        }
+
         for (Slot slot : reservedSlots) {
-            if (slot.getDate().equals(selectedDate) && slot.getTime().equals(selectedTime)) {
-                selectedSlot = slot;
-                break;
+            if(slot.getDate().equals(selectedDate)&&slot.getTime().equals(selectedTime)){
+                selectedSlot=slot;
             }
         }
 
@@ -395,15 +625,24 @@ public class SystemManager {
         }
 
         System.out.print("Enter the date (yyyy-mm-dd) of the slot you want to update: ");
-        String selectedDate = scanner.nextLine();
+        String dateInput = scanner.nextLine();
         System.out.print("Enter the time (hh:mm) of the slot you want to update: ");
-        String selectedTime = scanner.nextLine();
+        String timeInput = scanner.nextLine();
 
-        Slot selectedSlot = null;
+        Slot selectedSlot=null;
+        LocalDate selectedDate;
+        LocalTime selectedTime;
+        try {
+            selectedDate = LocalDate.parse(dateInput, DATE_FORMATTER);
+            selectedTime = LocalTime.parse(timeInput, TIME_FORMATTER);
+        } catch (DateTimeParseException e) {
+            System.out.println("Invalid date/time format: " + e.getMessage());
+            return;
+        }
+
         for (Slot slot : reservedSlots) {
-            if (slot.getDate().equals(selectedDate) && slot.getTime().equals(selectedTime)) {
-                selectedSlot = slot;
-                break;
+            if(slot.getDate().equals(selectedDate)&&slot.getTime().equals(selectedTime)){
+                selectedSlot=slot;
             }
         }
 
@@ -420,13 +659,23 @@ public class SystemManager {
         }
 
         System.out.print("Enter the new date (yyyy-mm-dd) for the slot: ");
-        String newDate = scanner.nextLine();
+        String newDatestr = scanner.nextLine();
         System.out.print("Enter the new time (hh:mm) for the slot: ");
-        String newTime = scanner.nextLine();
+        String newTimestr = scanner.nextLine();
+
+        LocalDate NewDate;
+        LocalTime NewTime;
+        try {
+            NewDate = LocalDate.parse(newDatestr, DATE_FORMATTER);
+            NewTime= LocalTime.parse(newTimestr, TIME_FORMATTER);
+        } catch (DateTimeParseException e) {
+            System.out.println("Invalid date/time format: " + e.getMessage());
+            return;
+        }
 
         Slot newSlot = null;
         for (Slot slot : selectedRoom.getVisitorsInEachSlot().keySet()) {
-            if (slot.getDate().equals(newDate) && slot.getTime().equals(newTime) && slot.isAvailable()) {
+            if (slot.getDate().equals(NewDate) && slot.getTime().equals(NewTime) && slot.isAvailable()) {
                 newSlot = slot;
                 break;
             }
@@ -446,7 +695,7 @@ public class SystemManager {
         visitor.setTotalFees(newSlot.getFees());
 
         System.out.println("Reservation updated for " + selectedRoom.getName() + " from " + selectedDate + " at " + selectedTime +
-                " to " + newDate + " at " + newTime);
+                " to " + NewDate + " at " + NewTime);
     }
 
     public ArrayList<Room> displayAvailableRoomsAndSlots(Visitor visitor) {
@@ -523,7 +772,8 @@ public class SystemManager {
             System.out.println("6. Display All Instructors");
             System.out.println("7. Calculate Total Fees");
             System.out.println("8. Update Entity");
-            System.out.println("9. Logout");
+            System.out.println("9. Leader Board");
+            System.out.println("10. Logout");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
             scanner.nextLine();
@@ -537,7 +787,9 @@ public class SystemManager {
                 case 6 -> displayAllInstructors();
                 case 7 -> calculateTotalFees();
                 case 8 -> updateEntity(scanner);
-                case 9 -> {
+                case 9 -> LeaderBoardForAdmin(scanner);
+                case 11 -> emptySafe(scanner);
+                case 12 -> {
                     System.out.println("Logging out...");
                     return;
                 }
@@ -553,12 +805,25 @@ public class SystemManager {
         scanner.nextLine();
 
         System.out.println("Enter the time (hh:mm) of the slot you want to create: ");
-        String time = scanner.nextLine();
+        String timeInput = scanner.nextLine();
 
         System.out.println("Enter the date (yyyy-mm-dd) of the slot you want to create: ");
-        String selectedDate = scanner.nextLine();
+        String dateInput = scanner.nextLine();
 
-        Slot newSlot = new Slot(time, selectedDate, selectedFees, true);
+        LocalDate NewDate;
+        LocalTime NewTime;
+        try {
+            NewDate = LocalDate.parse(dateInput, DATE_FORMATTER);
+            NewTime= LocalTime.parse(timeInput, TIME_FORMATTER);
+        } catch (DateTimeParseException e) {
+            System.out.println("Invalid date/time format: " + e.getMessage());
+            return;
+        }
+
+        
+        
+
+        Slot newSlot = new Slot(NewTime, NewDate, selectedFees, true);
         System.out.println("Enter the ID of the Room you want to create a slot in: ");
         int roomID = scanner.nextInt();
         scanner.nextLine();
@@ -673,17 +938,25 @@ public class SystemManager {
         for (Slot slot : selectedRoom.getVisitorsInEachSlot().keySet()) {
             System.out.println("Date: " + slot.getDate() + ", Time: " + slot.getTime());
         }
+        System.out.print("Enter the date (yyyy-mm-dd) of the slot you want to delete: ");
+        String dateInput = scanner.nextLine();
+        System.out.print("Enter the time (hh:mm) of the slot you want to delete: ");
+        String timeInput = scanner.nextLine();
+    
+        Slot slotToDelete=null;
+        LocalDate selectedDate;
+        LocalTime selectedTime;
+        try {
+            selectedDate = LocalDate.parse(dateInput, DATE_FORMATTER);
+            selectedTime = LocalTime.parse(timeInput, TIME_FORMATTER);
+        } catch (DateTimeParseException e) {
+            System.out.println("Invalid date/time format: " + e.getMessage());
+            return;
+        }
 
-        System.out.print("Enter the date (yyyy-mm-dd) of the slot to delete: ");
-        String date = scanner.nextLine();
-        System.out.print("Enter the time (hh:mm) of the slot to delete: ");
-        String time = scanner.nextLine();
-
-        Slot slotToDelete = null;
         for (Slot slot : selectedRoom.getVisitorsInEachSlot().keySet()) {
-            if (slot.getDate().equals(date) && slot.getTime().equals(time)) {
-                slotToDelete = slot;
-                break;
+            if(slot.getDate().equals(selectedDate)&&slot.getTime().equals(selectedTime)){
+                slotToDelete=slot;
             }
         }
 
@@ -718,7 +991,7 @@ public class SystemManager {
     public void displayAllVisitors() {
         System.out.println("\n--- All Visitors ---");
         for (Visitor visitor : visitors) {
-            System.out.println("ID: " + visitor.getId() + ", Name: " + visitor.getName() + ", Type: " + visitor.getType() + ", Total Fees: $" + visitor.getTotalFees());
+            visitor.displayDetails();
         }
     }
 
@@ -734,34 +1007,40 @@ public class SystemManager {
         System.out.println("\n--- All Instructors ---");
         for (Visitor visitor : visitors) {
             if (visitor.getType().equalsIgnoreCase("instructor")) {
-                System.out.println("ID: " + visitor.getId() + ", Name: " + visitor.getName());
+                visitor.displayDetails();
             }
         }
     }
 
     public void calculateTotalFees() {
-        double totalGeneral = 0;
-        double totalMeeting = 0;
-        double totalTeaching = 0;
+        double totalGeneralUnpayed = 0;
+        double totalMeetingUnpayed = 0;
+        double totalTeachingUnpayed = 0;
+        double totalGeneralpayed = 0;
+        double totalMeetingpayed = 0;
+        double totalTeachingpayed = 0;
+        for (Visitor visitor : visitors) {
+            if(visitor.getType().equals("general")){
+                totalGeneralUnpayed+=visitor.getTotalFees();
+                totalGeneralpayed+=visitor.getPayedFees();
+            }else if(visitor.getType().equals("formal")){
+                totalMeetingUnpayed+=visitor.getPayedFees();
+                totalMeetingUnpayed+=visitor.getTotalFees();
+            }else{
+                totalTeachingUnpayed+=visitor.getTotalFees();
+                totalTeachingUnpayed+=visitor.getPayedFees();
 
-        for (Room room : rooms) {
-            for (Slot slot : room.getVisitorsInEachSlot().keySet()) {
-                if (!slot.isAvailable()) {
-                    if (room instanceof GeneralRoom) {
-                        totalGeneral += slot.getFees();
-                    } else if (room instanceof MeetingRoom) {
-                        totalMeeting += slot.getFees();
-                    } else if (room instanceof TeachingRoom) {
-                        totalTeaching += slot.getFees();
-                    }
-                }
             }
         }
 
+
         System.out.println("\n--- Total Fees Collected ---");
-        System.out.println("General Rooms: $" + totalGeneral);
-        System.out.println("Meeting Rooms: $" + totalMeeting);
-        System.out.println("Teaching Rooms: $" + totalTeaching);
+        System.out.println("General Rooms Unpayed: $" + totalGeneralUnpayed +" General Rooms Payed: $" + totalGeneralpayed);
+        System.out.println("Meeting Rooms Unpayed: $" + totalMeetingUnpayed + " Meeting Rooms Payed: $" + totalMeetingpayed);
+        System.out.println("Teaching Rooms Unpayed: $" + totalTeachingUnpayed + " Teaching Rooms Payed: $" + totalTeachingpayed);
+        System.out.println("General Rooms TotalExpected: $" + totalGeneralUnpayed+totalGeneralpayed);
+        System.out.println("Meeting Rooms TotalExpected: $" + totalMeetingUnpayed + totalMeetingpayed);
+        System.out.println("Teaching Rooms TotalExpected: $" + totalTeachingUnpayed + totalTeachingpayed);
     }
 
     public void updateEntity(Scanner scanner) {
@@ -916,14 +1195,24 @@ public class SystemManager {
             System.out.println("Date: " + slot.getDate() + ", Time: " + slot.getTime() + ", Fees: $" + slot.getFees());
         }
 
-        System.out.print("Enter the date (yyyy-mm-dd) of the slot to update: ");
-        String date = scanner.nextLine();
-        System.out.print("Enter the time (hh:mm) of the slot to update: ");
-        String time = scanner.nextLine();
+        System.out.print("Enter the date (yyyy-mm-dd) of the slot you want to delete: ");
+        String dateInput = scanner.nextLine();
+        System.out.print("Enter the time (hh:mm) of the slot you want to delete: ");
+        String timeInput = scanner.nextLine();
+    
+        Slot slotToUpdate=null;
+        LocalDate selectedDate;
+        LocalTime selectedTime;
+        try {
+            selectedDate = LocalDate.parse(dateInput, DATE_FORMATTER);
+            selectedTime = LocalTime.parse(timeInput, TIME_FORMATTER);
+        } catch (DateTimeParseException e) {
+            System.out.println("Invalid date/time format: " + e.getMessage());
+            return;
+        }
 
-        Slot slotToUpdate = null;
         for (Slot slot : selectedRoom.getVisitorsInEachSlot().keySet()) {
-            if (slot.getDate().equals(date) && slot.getTime().equals(time)) {
+            if (slot.getDate().equals(selectedDate) && slot.getTime().equals(selectedTime)) {
                 slotToUpdate = slot;
                 break;
             }
@@ -933,6 +1222,20 @@ public class SystemManager {
             System.out.println("Slot not found.");
             return;
         }
+
+        System.out.println("Current Time: " + slotToUpdate.getTime().format(TIME_FORMATTER));
+        System.out.print("Enter new time (HH:mm) or press Enter to keep current: ");
+        String newTimeInput = scanner.nextLine();
+        if (!newTimeInput.isEmpty()) {
+            try {
+                LocalTime newTime = LocalTime.parse(newTimeInput, TIME_FORMATTER);
+                slotToUpdate.setTime(newTime);
+                System.out.println("Time updated successfully.");
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid time format! Keeping current time.");
+            }
+        }
+
 
         System.out.println("Current Fees: $" + slotToUpdate.getFees());
         System.out.print("Enter new fees (or press Enter to keep current): ");
@@ -959,5 +1262,36 @@ public class SystemManager {
         }
 
         System.out.println("Slot updated successfully.");
+    }
+
+    public void LeaderBoardForAdmin(Scanner scanner){
+        LeaderBoardForVisitor();
+        System.out.println("Do you want to applay the reward:");
+        String response = scanner.nextLine().trim().toLowerCase();
+    
+        if (response.equals("yes") || response.equals("y")) {
+            this.visitors.getFirst().addRewardHours(7);
+        } else if (response.equals("no") || response.equals("n")) {
+            System.out.println("Leader Board Has Been Checked.");
+        } else {
+            System.out.println("Invalid input. Please enter 'yes' or 'no'.");
+        }
+    }
+
+
+    public void emptySafe(Scanner scanner){
+        System.out.println("Do You Want To Empty The Safe?");
+        String response = scanner.nextLine().trim().toLowerCase();
+    
+        if (response.equals("yes") || response.equals("y")) {
+            for (Visitor visitor : visitors) {
+                visitor.setPayedFees(0);
+            }
+            System.out.println("بقينا علي الحميد المجيد");
+        } else if (response.equals("no") || response.equals("n")) {
+            System.out.println("البضاهة معايا");
+        } else {
+            System.out.println("Invalid input. Please enter 'yes' or 'no'.");
+        }
     }
 }

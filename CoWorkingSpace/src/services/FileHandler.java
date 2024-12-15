@@ -1,19 +1,25 @@
 package services;
 
 import java.io.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import model.*;
 
 public class FileHandler {
     //------->Visitor Load and Save
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE; // e.g., 2024-12-01
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm"); // e.g., 10:00
+
     public static ArrayList<Visitor> loadVisitors(String fileName){
         ArrayList<Visitor> visitorsData = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] data = line.split(",");
-                if (data.length < 8) {
+                if (data.length < 9) {
                     System.out.println("Invalid visitor data: " + line);
                     continue;
                 }
@@ -25,10 +31,12 @@ public class FileHandler {
                 int hoursRewarded = Integer.parseInt(data[5]);
                 double totalFees = Double.parseDouble(data[6]);
                 double penaltyFees = Double.parseDouble(data[7]);
+                double payedFees = Double.parseDouble(data[8]);
                 Visitor visitor = new Visitor(name, password, id, type, hoursReserved);
                 visitor.setPenaltyFees(penaltyFees);
                 visitor.setHoursRewarded(hoursRewarded);
                 visitor.setTotalFees(totalFees);
+                visitor.setPayedFees(payedFees);
                 visitorsData.add(visitor);
             }
         } catch (IOException e) {
@@ -47,7 +55,8 @@ public class FileHandler {
                              visitor.getHoursReserved() + "," + 
                              visitor.getHoursRewarded() + "," + 
                              visitor.getTotalFees() + "," + 
-                             visitor.getPenaltyFees());
+                             visitor.getPenaltyFees()+","+
+                             visitor.getPayedFees());
                 writer.newLine();
             }
         } catch (IOException e) {
@@ -102,10 +111,14 @@ public class FileHandler {
                     }
                 }    
                 else if (parts.length == 4 && isSlotLine(line)) {
-                    String slotDate = parts[0].trim();
-                    String slotTime = parts[1].trim();
-                    double slotFees = Double.parseDouble(parts[2].trim());
-                    boolean isAvailable = Boolean.parseBoolean(parts[3].trim());
+                    String[] slotData = line.split(",");
+                    String slotDateStr = slotData[0].trim();
+                    String slotTimeStr = slotData[1].trim();
+                    double slotFees = Double.parseDouble(slotData[2].trim());
+                    boolean isAvailable = Boolean.parseBoolean(slotData[3].trim());
+                    LocalDate slotDate = LocalDate.parse(slotDateStr, DATE_FORMATTER);
+                    LocalTime slotTime = LocalTime.parse(slotTimeStr, TIME_FORMATTER);
+
                     if (currentRoom != null) {
                         currentSlot = new Slot(slotTime, slotDate, slotFees, isAvailable);
                         currentRoom.addSlotVisitors(currentSlot);
@@ -158,7 +171,9 @@ public class FileHandler {
                 }
                 writer.newLine();
                 for (Slot slot : room.getVisitorsInEachSlot().keySet()) {
-                    writer.write(slot.getDate() + "," + slot.getTime() + "," + slot.getFees() + "," + slot.isAvailable());
+                    String slotDateStr = slot.getDate().format(DATE_FORMATTER);
+                    String slotTimeStr = slot.getTime().format(TIME_FORMATTER);
+                    writer.write(slotDateStr + "," + slotTimeStr + "," + slot.getFees() + "," + slot.isAvailable());
                     writer.newLine();
                     if(!slot.isAvailable()){
                         ArrayList<Visitor> slotVisitors = room.getSlotVisitors(slot);
@@ -179,7 +194,6 @@ public class FileHandler {
             System.out.println("Error saving rooms: " + e.getMessage());
         }
     }
-    //------->Room and Slots Load and Save
 
     private static boolean isRoomLine(String line) {
         return line.contains("Room");

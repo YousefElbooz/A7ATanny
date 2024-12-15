@@ -8,6 +8,7 @@ public class Visitor {
     private int hoursRewarded;
     private double penaltyFees;
     private double totalFees;
+    private double payedFees;
 
     public Visitor(String name, String password, int id, String type, int hoursReserved) {
         this.name = name;
@@ -18,7 +19,9 @@ public class Visitor {
         this.hoursReserved = 0;
         this.hoursRewarded=0;
         this.totalFees = 0;
+        this.payedFees=0;
         this.hoursReserved = hoursReserved;
+
     }
 
     // Overloaded constructor where hoursReserved defaults to 0
@@ -91,7 +94,7 @@ public class Visitor {
     }
 
     public void displayDetails(){
-        System.out.println("Name: " + name + " ID: " + id + " Type: " + type + " Hours Reserved: "+ hoursReserved  );
+        System.out.println("Name: " + name + " ID: " + id + " Type: " + type + " Hours Reserved: "+ hoursReserved + " Hours Rewarded: "+ this.hoursRewarded+" TotalFees: "+this.totalFees+ " Penalty Fees: "+ penaltyFees+ " Payed Fees: "+ payedFees );
     }
 
     public void setId(int id) {
@@ -107,6 +110,25 @@ public class Visitor {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public void payTotalFees(){
+        this.payedFees+=totalFees;
+        this.penaltyFees=0;
+        this.totalFees=0;
+    }
+
+    public void payPenaltyFees(){
+        this.payedFees+=penaltyFees;
+        this.penaltyFees=0;
+    }
+
+    public double getPayedFees() {
+        return payedFees;
+    }
+
+    public void setPayedFees(double payedFees) {
+        this.payedFees = payedFees;
     }
 
 }

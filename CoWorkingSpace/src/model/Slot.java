@@ -1,14 +1,15 @@
 package model;
 
-import java.util.ArrayList;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class Slot {
-    private String time;
-    private String date;
+    private LocalTime time;
+    private LocalDate date;
     private double fees;
     private boolean isAvailable;
 
-    public Slot(String time, String date, double fees,boolean isAvailable) {
+    public Slot(LocalTime time, LocalDate date, double fees,boolean isAvailable) {
         this.time = time;
         this.date = date;
         this.fees = fees;
@@ -34,7 +35,7 @@ public class Slot {
         return isAvailable;
     }
 
-    public String getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
@@ -42,8 +43,14 @@ public class Slot {
         return fees;
     }
 
+    public void setTime(LocalTime time) {
+        this.time = time;
+    }
     
-    public String getTime() {
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+    public LocalTime getTime() {
         return time;
     }
 }
