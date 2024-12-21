@@ -6,7 +6,6 @@ import services.*;
 public class Main{
 
     public static void main(String[] args) throws Exception {
-        // launch(args);
             Scanner scanner = new Scanner(System.in);
             SystemManager systemManager = new SystemManager();
         
@@ -27,6 +26,7 @@ public class Main{
                     return;
                 }
                 default -> System.out.println("Invalid option. Please try again.");
+
             }
         }
     }

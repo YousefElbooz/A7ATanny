@@ -5,7 +5,7 @@ BB,A7A,13,general,5,0,0.0,0.0,0.0
 Ma7ame7oo,A7A,3,general,4,0,30.0,0.0,0.0
 B,A7A,6,general,4,0,10.0,0.0,0.0
 AA,A7A,12,general,4,0,0.0,0.0,0.0
-F,A7A,10,general,4,0,15.0,0.0,0.0
+F,A7A,10,general,5,0,0.0,0.0,45.0
 C,A7A,7,general,3,0,0.0,0.0,0.0
 D,A7A,8,general,3,0,0.0,0.0,0.0
 E,A7A,9,general,3,0,0.0,0.0,0.0

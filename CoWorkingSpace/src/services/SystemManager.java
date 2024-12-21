@@ -326,7 +326,7 @@ public class SystemManager {
                 while (!validChoice) {
                     System.out.println("\nPayment Options:");
                     System.out.println("1. Pay this reservation's fee now.");
-                    System.out.println("2. Pay your total accumulated fees now.");
+                    System.out.println("2. Pay your total accumulated fees now with this reservation fees.");
                     System.out.println("3. Skip payment for now (fees will be added to your account).");
                     System.out.print("Choose an option (1/2/3): ");
                     String paymentChoice = scanner.nextLine().trim();
@@ -340,6 +340,7 @@ public class SystemManager {
                             break;
                         case "2":
                             // Pay total accumulated fees
+                            visitor.setTotalFees(visitor.getTotalFees()+selectedSlot.getFees());
                             double totalFees = visitor.getTotalFees();
                             if (totalFees > 0) {
                                 visitor.payTotalFees();
