@@ -9,7 +9,23 @@
             "c:\\Users\\Yousef\\Downloads\\javafx-sdk-23.0.1\\lib\\javafx.media.jar",
             "c:\\Users\\Yousef\\Downloads\\javafx-sdk-23.0.1\\lib\\javafx.swing.jar",
             "c:\\Users\\Yousef\\Downloads\\javafx-sdk-23.0.1\\lib\\javafx.web.jar",
-            "c:\\Users\\Yousef\\Downloads\\javafx-sdk-23.0.1\\lib\\javafx-swt.jar"
+            "c:\\Users\\Yousef\\Downloads\\javafx-sdk-23.0.1\\lib\\javafx-swt.jar",
+            "d:\\javafx-sdk-23.0.1\\lib\\javafx.base.jar",
+            "d:\\javafx-sdk-23.0.1\\lib\\javafx.controls.jar",
+            "d:\\javafx-sdk-23.0.1\\lib\\javafx.fxml.jar",
+            "d:\\javafx-sdk-23.0.1\\lib\\javafx.graphics.jar",
+            "d:\\javafx-sdk-23.0.1\\lib\\javafx.media.jar",
+            "d:\\javafx-sdk-23.0.1\\lib\\javafx.swing.jar",
+            "d:\\javafx-sdk-23.0.1\\lib\\javafx.web.jar",
+            "d:\\javafx-sdk-23.0.1\\lib\\javafx-swt.jar",
+            "d:\\E partition\\ownload\\javafx-sdk-23.0.1\\lib\\javafx.base.jar",
+            "d:\\E partition\\ownload\\javafx-sdk-23.0.1\\lib\\javafx.controls.jar",
+            "d:\\E partition\\ownload\\javafx-sdk-23.0.1\\lib\\javafx.fxml.jar",
+            "d:\\E partition\\ownload\\javafx-sdk-23.0.1\\lib\\javafx.graphics.jar",
+            "d:\\E partition\\ownload\\javafx-sdk-23.0.1\\lib\\javafx.media.jar",
+            "d:\\E partition\\ownload\\javafx-sdk-23.0.1\\lib\\javafx.swing.jar",
+            "d:\\E partition\\ownload\\javafx-sdk-23.0.1\\lib\\javafx.web.jar",
+            "d:\\E partition\\ownload\\javafx-sdk-23.0.1\\lib\\javafx-swt.jar"
         ],
         "exclude": [
             "c:\\Users\\Yousef\\Downloads\\javafx-sdk-17.0.13\\lib\\javafx-swt.jar",
@@ -25,7 +41,8 @@
             "c:\\Users\\Yousef\\Downloads\\javafx-sdk-23.0.1\\lib\\javafx.fxml.jar",
             "c:\\Users\\Yousef\\Downloads\\javafx-sdk-23.0.1\\lib\\javafx.media.jar",
             "c:\\Users\\Yousef\\Downloads\\javafx-sdk-23.0.1\\lib\\javafx.graphics.jar",
-            "c:\\Users\\Yousef\\Downloads\\javafx-sdk-23.0.1\\lib\\javafx.swing.jar"
+            "c:\\Users\\Yousef\\Downloads\\javafx-sdk-23.0.1\\lib\\javafx.swing.jar",
+            "d:\\E partition\\ownload\\javafx-sdk-23.0.1\\lib\\javafx-swt.jar"
         ]
     },
     "CodeGPT.apiKey": "CodeGPT Plus Beta"

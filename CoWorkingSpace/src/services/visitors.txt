@@ -1,19 +1,20 @@
-Yosef,01218972,1,general,19,5,10.0,0.0,190.0
+Yosef,01218972,1,general,20,11,10.0,0.0,0.0
 3adel Shakel,555555,1,formal,5,0,15.0,0.0,0.0
-Ahmed,0123,2,formal,0,0,0.0,0.0,0.0
-Ma7ame7oo,A7A,3,general,3,0,0.0,0.0,0.0
-Bal7a,01218972,4,instructor,0,0,0.0,0.0,0.0
 A,A7A,5,general,5,0,10.0,0.0,0.0
+BB,A7A,13,general,5,0,0.0,0.0,0.0
+Ma7ame7oo,A7A,3,general,4,0,30.0,0.0,0.0
 B,A7A,6,general,4,0,10.0,0.0,0.0
+AA,A7A,12,general,4,0,0.0,0.0,0.0
+F,A7A,10,general,4,0,15.0,0.0,0.0
 C,A7A,7,general,3,0,0.0,0.0,0.0
 D,A7A,8,general,3,0,0.0,0.0,0.0
 E,A7A,9,general,3,0,0.0,0.0,0.0
-F,A7A,10,general,3,0,0.0,0.0,0.0
 G,A7A,11,general,3,0,0.0,0.0,0.0
-AA,A7A,12,general,4,0,0.0,0.0,0.0
-BB,A7A,13,general,5,0,0.0,0.0,0.0
 CC,A7A,14,general,3,0,0.0,0.0,0.0
 DD,A7A,15,general,3,0,0.0,0.0,0.0
 EE,A7A,16,general,3,0,0.0,0.0,0.0
 FF,A7A,17,general,3,0,0.0,0.0,0.0
 GG,A7A,18,general,3,0,0.0,0.0,0.0
+Hamu,999,20,formal,1,0,25.0,0.0,0.0
+Ahmed,0123,2,formal,0,0,0.0,0.0,0.0
+Bal7a,01218972,4,instructor,0,0,0.0,0.0,0.0

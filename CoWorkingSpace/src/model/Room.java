@@ -13,11 +13,11 @@ public abstract class Room {
     }
 
     public abstract void setName(String name);
+
     public abstract void setID(int iD);
 
     public abstract int getMaxNumber();
 
-    
     public abstract boolean addSlotVisitors(ArrayList<Visitor> visitors, Slot slot);
 
     public abstract boolean addSlotVisitors(Visitor visitor, Slot slot);
